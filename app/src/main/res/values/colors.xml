@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#191947</color>
+    <color name="colorPrimaryDark">#191947</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorBackgroundDim">#66000000</color>
+    <color name="colorTextBlackNormal">#707070</color>
+    <color name="colorTextBlackPress">#B2707070</color>
+    <color name="colorTextBlueNormal">#1E46FF</color>
+    <color name="colorTextBluePress">#B21E46FF</color>
+    <color name="colorDivider">#D6DBDE</color>
+</resources>
