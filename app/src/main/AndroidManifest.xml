@@ -20,6 +20,7 @@
         android:theme="@style/Theme.Creacube"
         android:usesCleartextTraffic="true"
         tools:ignore="LockedOrientationActivity">
+        <activity android:name=".ConnectActivity"></activity>
         <activity
             android:name=".SplashActivity"
             android:screenOrientation="landscape">
