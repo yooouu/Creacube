@@ -22,7 +22,7 @@
         tools:ignore="LockedOrientationActivity">
         <activity
             android:name=".ConnectActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="landscape">
 
         </activity>
         <activity
