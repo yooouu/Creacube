@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -58,6 +59,15 @@ public class MainActivity extends AppCompatActivity {
         } else {
             webView.loadUrl(URL);
         }
+
+        // TODO Delete
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                requestToConnect();
+            }
+        }, 3000);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package kr.co.creacube.util;
 
+import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
@@ -16,7 +17,8 @@ public class AndroidBridge {
 
     // Bridge function
     @JavascriptInterface
-    public void cubeconnect() {
+    public void cubeconnect(String type) {
+        Log.e("aaa", type);
         act.requestToConnect();
     }
 
