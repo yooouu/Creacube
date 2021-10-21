@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 큐브 연결 리스트 화면 이동 요청
     public void requestToConnect() {
-
+        Intent intent = new Intent(MainActivity.this, ConnectActivity.class);
+        startActivity(intent);
     }
 }
