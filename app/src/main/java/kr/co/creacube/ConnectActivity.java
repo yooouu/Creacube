@@ -33,6 +33,7 @@ import java.util.UUID;
 import kr.co.creacube.adapter.CubeListAdapter;
 import kr.co.creacube.component.ConfirmDialog;
 import kr.co.creacube.component.MessagePopup;
+import kr.co.creacube.component.WifiListPopup;
 import kr.co.creacube.util.CommonUtil;
 
 import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
@@ -44,6 +45,7 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
     private List<String> cubeList = new ArrayList<>();
 
     RecyclerView recyclerCube;
+    String type = "S";  // S : 학생 , T : 선생님 , W : 없음
 
     // Bluetooth
     BluetoothAdapter bluetoothAdapter;
@@ -60,10 +62,15 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
     final static int BT_CONNECTING_STATUS = 3;
     final static UUID BT_UUID = UUID.fromString("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
 
+    final static int WIFI_REQUEST_LIST = 1000;
+    final static int WIFI_GET_SUCCESS = 1001;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
+
+        type = getIntent().getStringExtra("type");
 
         Button closeButton = findViewById(R.id.btn_close);
         Button wifiButton = findViewById(R.id.btn_wifi);
@@ -129,7 +136,8 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
                     popup.show();
                 } else {
                     //TODO ble connect and wifi setup
-
+                    Intent intent = new Intent(ConnectActivity.this, WifiListPopup.class);
+                    startActivityForResult(intent, WIFI_REQUEST_LIST);
                 }
                 break;
         }
@@ -144,6 +152,15 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
                     listPairedDevices();
                 } else if (resultCode == RESULT_CANCELED) {
                     // 블루투스 비활성화
+                }
+                break;
+
+            case WIFI_REQUEST_LIST:
+                if (resultCode == WIFI_GET_SUCCESS) {
+                    String ssid = data.getStringExtra("ssid");
+                    String pw = data.getStringExtra("pw");
+                    Log.e("aaa", "ssid : " + ssid + " pw : " + pw);
+                    //TODO wifi setup
                 }
                 break;
         }

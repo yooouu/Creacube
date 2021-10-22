@@ -59,15 +59,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             webView.loadUrl(URL);
         }
-
-        // TODO Delete
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                requestToConnect();
-            }
-        }, 3000);
     }
 
     @Override
@@ -117,8 +108,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 큐브 연결 리스트 화면 이동 요청
-    public void requestToConnect() {
+    public void requestToConnect(String type) {
         Intent intent = new Intent(MainActivity.this, ConnectActivity.class);
+        intent.putExtra("type", type);
         startActivity(intent);
     }
 }

@@ -17,9 +17,9 @@ public class AndroidBridge {
 
     // Bridge function
     @JavascriptInterface
-    public void cubeconnect(String type) {
+    public void CubeConnect(String type) {
         Log.e("aaa", type);
-        act.requestToConnect();
+        act.requestToConnect(type);
     }
 
 }
