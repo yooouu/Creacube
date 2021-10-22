@@ -8,12 +8,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +31,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import kr.co.creacube.adapter.CubeListAdapter;
+import kr.co.creacube.component.ConfirmDialog;
+import kr.co.creacube.component.MessagePopup;
+import kr.co.creacube.util.CommonUtil;
 
+import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
 import static kr.co.creacube.util.CommonUtil.showToast;
 
 public class ConnectActivity extends AppCompatActivity implements View.OnClickListener {
@@ -56,7 +65,12 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
 
+        Button closeButton = findViewById(R.id.btn_close);
+        Button wifiButton = findViewById(R.id.btn_wifi);
         recyclerCube = findViewById(R.id.rv_cube_list);
+
+        closeButton.setOnClickListener(this);
+        wifiButton.setOnClickListener(this);
 
         // Bluetooth
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -80,6 +94,7 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
 
         bluetoothOn();
         listPairedDevices();
+        searchDevice();
     }
 
     @Override
@@ -90,12 +105,32 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unregisterReceiver(receiver);
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_close:
                 finish();
             case R.id.btn_wifi:
-                //TODO
+                if (cubeList.size() == 0) {
+                    final MessagePopup popup = new MessagePopup(this);
+                    popup.setTitle(R.string.popup_power_on);
+                    popup.setCloseListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            popup.dismiss();
+                        }
+                    });
+                    popup.show();
+                } else {
+                    //TODO ble connect and wifi setup
+
+                }
                 break;
         }
     }
@@ -145,12 +180,12 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
             if (pairedDevices.size() > 0) {
                 pairedDevicesList = new ArrayList<String>();
                 for (BluetoothDevice device : pairedDevices) {
-                    pairedDevicesList.add(device.getName());
+                    if (device.getName().startsWith("CREACUBE")) {
+                        pairedDevicesList.add(device.getName());
+                        cubeList.add(device.getName());
+                    }
                 }
-                cubeList = pairedDevicesList;
                 setDeviceList();
-//                final CharSequence[] items = pairedDevicesList.toArray(new CharSequence[pairedDevicesList.size()]);
-//                pairedDevicesList.toArray(new CharSequence()[pairedDevicesList.size()]);
 
             } else {
 
@@ -159,6 +194,40 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
             showToast(R.string.toast_on_bt);
         }
     }
+
+    public void searchDevice() {
+        if (bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+
+        } else {
+            if (bluetoothAdapter.isEnabled()) {
+                bluetoothAdapter.startDiscovery();
+                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+                registerReceiver(receiver, filter);
+
+            } else {
+                showToast(R.string.toast_on_bt);
+            }
+        }
+    }
+
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Discovery has found a device
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                String deviceName = device.getName();
+                String address = device.getAddress();   // MAC Address
+
+                if (deviceName != null && deviceName.startsWith("CREACUBE")) {
+                    cubeList.add(deviceName);
+                    setDeviceList();
+                }
+            }
+        }
+    };
 
     public void connectDevice(String deviceName) {
         for (BluetoothDevice tempDevice : pairedDevices) {

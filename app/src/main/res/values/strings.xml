@@ -12,4 +12,7 @@
     <string name="toast_invaild_bt">블루투스를 지원하지 않는 기기입니다.</string>
     <string name="toast_on_bt">블루투스가 비활성화 되어 있습니다.\n블루투스를 켜주세요.</string>
     <string name="toast_error_connect">블루투스 연결 중 오류가 발생했습니다.</string>
+
+    <string name="popup_power_on">큐브의 전원을 켜주세요</string>
+    <string name="popup_wifi_connect">큐브의 wifi를 연결 해주세요</string>
 </resources>
