@@ -3,6 +3,7 @@ package kr.co.creacube.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -55,11 +56,13 @@ public class CubeListAdapter extends RecyclerView.Adapter<CubeListAdapter.CubeHo
 
         private View view;
         private TextView tvCubeName;
+        private ImageView ivStatus;
 
         CubeHolder(View view) {
             super(view);
             this.view = view;
             this.tvCubeName = view.findViewById(R.id.tv_cube_name);
+            this.ivStatus = view.findViewById(R.id.iv_status);
         }
 
         void onBind(String data, final int position) {

@@ -42,15 +42,17 @@ import static kr.co.creacube.util.CommonUtil.showToast;
 public class ConnectActivity extends AppCompatActivity implements View.OnClickListener {
 
     private CubeListAdapter cubeListAdapter;
-    private List<String> cubeList = new ArrayList<>();
 
     RecyclerView recyclerCube;
     String type = "S";  // S : 학생 , T : 선생님 , W : 없음
 
     // Bluetooth
     BluetoothAdapter bluetoothAdapter;
-    Set<BluetoothDevice> pairedDevices;
+//    Set<BluetoothDevice> pairedDevices;
+    List<BluetoothDevice> pairedDevices = new ArrayList<>();
     List<String> pairedDevicesList;
+
+    List<String> cubeList = new ArrayList<>();
 
     Handler bluetoothHandler;
     ConnectedBluetoothThread connectedBluetoothThread;
@@ -64,6 +66,8 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
 
     final static int WIFI_REQUEST_LIST = 1000;
     final static int WIFI_GET_SUCCESS = 1001;
+
+    private int currentIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +126,11 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_close:
-                finish();
+                //TODO Delete 
+                Intent intent1 = new Intent(ConnectActivity.this, WifiListPopup.class);
+                startActivityForResult(intent1, WIFI_REQUEST_LIST);
+//                finish();
+                break;
             case R.id.btn_wifi:
                 if (cubeList.size() == 0) {
                     final MessagePopup popup = new MessagePopup(this);
@@ -131,6 +139,8 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void onClick(View v) {
                             popup.dismiss();
+                            listPairedDevices();
+                            searchDevice();
                         }
                     });
                     popup.show();
@@ -161,6 +171,7 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
                     String pw = data.getStringExtra("pw");
                     Log.e("aaa", "ssid : " + ssid + " pw : " + pw);
                     //TODO wifi setup
+                    connectDevice(cubeList.get(currentIndex));
                 }
                 break;
         }
@@ -192,12 +203,14 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
 
     public void listPairedDevices() {
         if (bluetoothAdapter.isEnabled()) {
-            pairedDevices = bluetoothAdapter.getBondedDevices();
+            Set<BluetoothDevice> deviceSet;
+            deviceSet = bluetoothAdapter.getBondedDevices();
 
-            if (pairedDevices.size() > 0) {
+            if (deviceSet.size() > 0) {
                 pairedDevicesList = new ArrayList<String>();
-                for (BluetoothDevice device : pairedDevices) {
+                for (BluetoothDevice device : deviceSet) {
                     if (device.getName().startsWith("CREACUBE")) {
+                        pairedDevices.add(device);
                         pairedDevicesList.add(device.getName());
                         cubeList.add(device.getName());
                     }
@@ -239,6 +252,10 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
                 String address = device.getAddress();   // MAC Address
 
                 if (deviceName != null && deviceName.startsWith("CREACUBE")) {
+                    bluetoothAdapter.getRemoteDevice(device.getAddress());
+
+                    pairedDevices.add(device);
+                    pairedDevicesList.add(deviceName);
                     cubeList.add(deviceName);
                     setDeviceList();
                 }
@@ -253,9 +270,11 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             }
         }
+
         try {
             bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(BT_UUID);
             bluetoothSocket.connect();
+
             connectedBluetoothThread = new ConnectedBluetoothThread(bluetoothSocket);
             connectedBluetoothThread.start();
             bluetoothHandler.obtainMessage(BT_CONNECTING_STATUS, 1, -1).sendToTarget();
@@ -286,6 +305,8 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         public void run() {
+            bluetoothAdapter.cancelDiscovery();
+
             byte[] buffer = new byte[1024];
             int bytes;
 

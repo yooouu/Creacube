@@ -50,10 +50,10 @@ public class WifiListAdapter extends RecyclerView.Adapter<WifiListAdapter.WifiLi
         holder.tvWifiSSID.setText(ssid);
 
         if (selectedPosition == position) {
-            holder.tvWifiSSID.setTextColor(Color.parseColor("#FF0000"));
+            holder.tvWifiSSID.setTextColor(Color.parseColor("#FFFF00"));
 
         } else {
-            holder.tvWifiSSID.setTextColor(Color.parseColor("#000000"));
+            holder.tvWifiSSID.setTextColor(Color.parseColor("#FFFFFF"));
         }
 
         holder.wifiItem.setTag(""+position);

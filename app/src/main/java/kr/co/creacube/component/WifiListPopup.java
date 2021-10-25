@@ -38,6 +38,7 @@ public class WifiListPopup extends Activity implements View.OnClickListener {
     WifiListAdapter wifiListAdapter;
 
     private WifiManager wifiManager;
+    private BroadcastReceiver wifiScanReceiver;
 
     ArrayList<String> wifiList = new ArrayList<>();
 
@@ -66,6 +67,14 @@ public class WifiListPopup extends Activity implements View.OnClickListener {
         layout_loading.setVisibility(View.VISIBLE);
 
         wifiScan();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (wifiScanReceiver != null) {
+            unregisterReceiver(wifiScanReceiver);
+        }
     }
 
     @Override
@@ -100,7 +109,7 @@ public class WifiListPopup extends Activity implements View.OnClickListener {
     public void wifiScan() {
         wifiManager = (WifiManager)this.getApplicationContext().getSystemService(WIFI_SERVICE);
 
-        BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
+        wifiScanReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 boolean success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
